@@ -63,15 +63,34 @@ let dayPlanner = [
         meridiem: 'pm',
         note: ''
     },
-    {
-        id: '9',
-        hour: '06',
-        time: '18',
-        meridiem: 'pm',
-        note: '',
-    }
 ]
-
+/*uses moment.js in a function to display date and time to the header*/
+function getDate() {
+    let headerDateNow = moment().format('dddd, MMMM Do');
+    let headerTimeNow = moment().hours(Number);
+    $("#currentDay").text(headerDateNow);
+    $('#currentTime').text(headerTimeNow);
+}
+/* writes note to local storage(or its supposed to)*/
+function noteSave(meetingTime,meetingText) {
+    /*need to capture text and place it into the local storage*/
+    localStorage.setItem(meetingTime, JSON.stringify(meetingText));
+}
+/*should pull any stored data from local storage*/
+function showNote() {
+    dayPlanner.forEach(function (currentHour) {
+        $(`#${currentHour.id}`).val(currentHour.note);
+    })
+}
+/*displays the stored notes for local storage*/
+function initialize() {
+    let savedNote = JSON.parse(localStorage.getItem("dayPlanner"));
+    if (savedNote) {
+        dayPlanner = savedNote;
+    }
+    noteSave();
+    showNote();
+}
 /*sets current date and time to header*/
 getDate();
 /*set the style of the columns and rows*/
@@ -116,3 +135,15 @@ dayPlanner.forEach(function(thisHour) {
     saveNote.append(saveNoteButton);
     thisHourRow.append(timeSlotArea, timeBlockNote, saveNote);
 })
+/*to load local storage*/
+initialize();
+/*save the notes to local storage*/
+$(".saveBtn").on("click", function(event) {
+    event.preventDefault();
+    let localIndexSave = $(this).siblings(".description").children(".future").attr("id");
+    dayPlanner[localIndexSave] = $(this).siblings(".description").children(".future").val();
+    console.log(localIndexSave);
+    /*added output.*/
+    noteSave("hour9","this is my meeting");
+    showNote();
+});
